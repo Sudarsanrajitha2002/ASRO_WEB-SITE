@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASOR - Advanced Traffic Intelligence Platform</title>
+    <meta name="description" content="ASOR delivers cutting-edge AI-powered traffic management solutions for smart cities. Real-time analytics, predictive modeling, and autonomous traffic optimization.">
+    
+    <!-- Advanced Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="icon" type="image/png" href="/favicon.png">
+    
+    <!-- Preload Critical Resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" as="style">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Three.js for 3D Graphics -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    
+    <style>
+        :root {
+            --primary-orange: #FF6B35;
+            --primary-blue: #0A1628;
+            --secondary-blue: #1E3A5F;
+            --accent-cyan: #00D4FF;
+            --accent-green: #00F5A0;
+            --neutral-100: #FFFFFF;
+            --neutral-200: #F8FAFC;
+            --neutral-300: #E2E8F0;
+            --neutral-400: #94A3B8;
+            --neutral-500: #64748B;
+            --neutral-600: #475569;
+            --neutral-700: #334155;
+            --neutral-800: #1E293B;
+            --neutral-900: #0F172A;
+            
+            --gradient-primary: linear-gradient(135deg, var(--primary-orange) 0%, var(--accent-cyan) 100%);
+            --gradient-secondary: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+            --gradient-glow: linear-gradient(135deg, rgba(255, 107, 53, 0.2) 0%, rgba(0, 212, 255, 0.2) 100%);
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            --shadow-glow: 0 0 50px rgba(255, 107, 53, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary-blue);
+            color: var(--neutral-100);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Advanced Typography */
+        .h1 {
+            font-size: clamp(3rem, 8vw, 7rem);
+            font-weight: 800;
+            line-height: 0.9;
+            letter-spacing: -0.02em;
+        }
+
+        .h2 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.01em;
+        }
+
+        .h3 {
+            font-size: clamp(1.5rem, 4vw, 2.5rem);
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        .body-large {
+            font-size: clamp(1.125rem, 2vw, 1.25rem);
+            font-weight: 400;
+            opacity: 0.9;
+        }
+
+        .body-mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        /* Advanced Navigation */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 22, 40, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 22, 40, 0.98);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--neutral-100);
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.25rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-link {
+            color: var(--neutral-300);
+            text-decoration: none;
+            font-weight: 500;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .cta-button {
+            background: var(--gradient-primary);
+            color: var(--neutral-100);
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        /* Hero Section with 3D Background */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 1200px;
+            padding: 0 2rem;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .hero-title {
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--neutral-100) 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--neutral-100);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.125rem;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-lg);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--neutral-100);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.125rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 5rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 1.125rem;
+            color: var(--neutral-300);
+            font-weight: 500;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 8rem 2rem;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 5rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            background: var(--gradient-primary);
+            color: var(--neutral-100);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .features-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 3rem;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient-primary);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+
+        .feature-title {
+            margin-bottom: 1rem;
+            color: var(--neutral-100);
+        }
+
+        .feature-description {
+            color: var(--neutral-300);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-link {
+            color: var(--accent-cyan);
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-link:hover {
+            gap: 0.75rem;
+        }
+
+        /* Dashboard Preview */
+        .dashboard-section {
+            padding: 8rem 2rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .dashboard-preview {
+            margin-top: 4rem;
+            position: relative;
+            background: var(--gradient-secondary);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: var(--shadow-xl);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .dashboard-screen {
+            background: var(--neutral-900);
+            border-radius: 16px;
+            padding: 2rem;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .dashboard-widget {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            text-align: left;
+        }
+
+        .widget-title {
+            font-size: 0.875rem;
+            color: var(--neutral-400);
+            margin-bottom: 0.5rem;
+        }
+
+        .widget-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 0.25rem;
+        }
+
+        .widget-change {
+            font-size: 0.75rem;
+            color: var(--accent-green);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 8rem 2rem;
+            background: var(--gradient-primary);
+            text-align: center;
+            color: var(--neutral-100);
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            margin-bottom: 1rem;
+            color: var(--neutral-100);
+        }
+
+        .cta-description {
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--neutral-900);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h4 {
+            margin-bottom: 1rem;
+            color: var(--neutral-100);
+            font-weight: 600;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: var(--neutral-400);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-cyan);
+        }
+
+        .footer-bottom {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            text-align: center;
+            color: var(--neutral-400);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 107, 53, 0.3); }
+            50% { box-shadow: 0 0 40px rgba(255, 107, 53, 0.6); }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .animate-pulse-glow {
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-preview {
+                padding: 1rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--neutral-800);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gradient-primary);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-orange);
+        }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease;
+        }
+
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--primary-orange);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">
+                <div class="logo-icon">A</div>
+                <span>ASOR</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="#solutions" class="nav-link">Solutions</a></li>
+                <li><a href="#platform" class="nav-link">Platform</a></li>
+                <li><a href="#insights" class="nav-link">Insights</a></li>
+                <li><a href="#company" class="nav-link">Company</a></li>
+            </ul>
+            <a href="#contact" class="cta-button">Get Started</a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="hero">
+        <canvas class="hero-canvas" id="heroCanvas"></canvas>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <span class="body-mono">AI-Powered</span>
+                <span>🚀 Next-Gen Traffic Intelligence</span>
+            </div>
+            <h1 class="h1 hero-title">For the Traffic You Would Love</h1>
+            <p class="body-large hero-subtitle">
+                Transform urban mobility with ASOR's advanced AI-driven traffic management platform. 
+                Real-time optimization, predictive analytics, and autonomous coordination for smarter cities.
+            </p>
+            <div class="hero-actions">
+                <a href="#platform" class="btn-primary">
+                    Explore Platform
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+                <a href="#demo" class="btn-secondary">
+                    Watch Demo
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5,3 19,12 5,21"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" data-count="98">0</div>
+                <div class="stat-label">% Traffic Flow Improvement</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-count="45">0</div>
+                <div class="stat-label">% Reduction in Congestion</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-count="200">0</div>
+                <div class="stat-label">+ Cities Worldwide</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" data-count="30">0</div>
+                <div class="stat-label">% Fuel Savings</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section" id="solutions">
+        <div class="section-header">
+            <span class="section-badge">Intelligent Solutions</span>
+            <h2 class="h2">Revolutionary Traffic Management</h2>
+            <p class="body-large">
+                Harness the power of artificial intelligence and real-time data analytics to create 
+                the most efficient traffic flow systems ever deployed.
+            </p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🧠</div>
+                <h3 class="h3 feature-title">AI-Powered Optimization</h3>
+                <p class="feature-description">
+                    Advanced machine learning algorithms continuously analyze traffic patterns, 
+                    predict congestion, and automatically optimize signal timing for maximum efficiency.
+                </p>
+                <a href="#" class="feature-link">
+                    Learn more
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3 class="h3 feature-title">Real-Time Analytics</h3>
+                <p class="feature-description">
+                    Monitor traffic flow, incident detection, and system performance with 
+                    comprehensive dashboards and predictive insights powered by live data streams.
+                </p>
+                <a href="#" class="feature-link">
+                    Explore analytics
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌍</div>
+                <h3 class="h3 feature-title">Smart City Integration</h3>
+                <p class="feature-description">
+                    Seamlessly integrate with existing urban infrastructure, IoT sensors, 
+                    and smart city platforms for holistic traffic management solutions.
+                </p>
+                <a href="#" class="feature-link">
+                    View integrations
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">⚡</div>
+                <h3 class="h3 feature-title">Autonomous Response</h3>
+                <p class="feature-description">
+                    Intelligent incident detection and automated response systems that adapt 
+                    traffic flows in real-time without human intervention.
+                </p>
+                <a href="#" class="feature-link">
+                    See automation
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔒</div>
+                <h3 class="h3 feature-title">Enterprise Security</h3>
+                <p class="feature-description">
+                    Military-grade encryption, secure cloud infrastructure, and compliance 
+                    with international standards ensure your traffic data stays protected.
+                </p>
+                <a href="#" class="feature-link">
+                    Security details
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🌱</div>
+                <h3 class="h3 feature-title">Sustainability Focus</h3>
+                <p class="feature-description">
+                    Reduce carbon emissions by up to 30% through optimized traffic flows, 
+                    intelligent routing, and support for electric vehicle infrastructure.
+                </p>
+                <a href="#" class="feature-link">
+                    Green solutions
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="m9 18 6-6-6-6"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section class="dashboard-section" id="platform">
+        <div class="dashboard-container">
+            <div class="section-header">
+                <span class="section-badge">Live Platform</span>
+                <h2 class="h2">Command Center Dashboard</h2>
+                <p class="body-large">
+                    Experience the future of traffic management with our intuitive, 
+                    real-time dashboard that gives you complete control over your city's traffic ecosystem.
+                </p>
+            </div>
+            <div class="dashboard-preview animate-float">
+                <div class="dashboard-screen">
+                    <div class="dashboard-grid">
+                        <div class="dashboard-widget">
+                            <div class="widget-title">Traffic Flow</div>
+                            <div class="widget-value">1,247</div>
+                            <div class="widget-change">+12% from last hour</div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <div class="widget-title">Avg Speed</div>
+                            <div class="widget-value">42 mph</div>
+                            <div class="widget-change">+8% optimal</div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <div class="widget-title">Incidents</div>
+                            <div class="widget-value">3</div>
+                            <div class="widget-change">Auto-resolving</div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <div class="widget-title">Efficiency</div>
+                            <div class="widget-value">94.2%</div>
+                            <div class="widget-change">+2.1% today</div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <div class="widget-title">Energy Saved</div>
+                            <div class="widget-value">847 kWh</div>
+                            <div class="widget-change">+15% this week</div>
+                        </div>
+                        <div class="dashboard-widget">
+                            <div class="widget-title">Predictions</div>
+                            <div class="widget-value">99.1%</div>
+                            <div class="widget-change">Accuracy rate</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section" id="contact">
+        <div class="cta-container">
+            <h2 class="h2 cta-title">Ready to Transform Your City?</h2>
+            <p class="body-large cta-description">
+                Join 200+ cities worldwide that have revolutionized their traffic management 
+                with ASOR's AI-powered platform. Get started with a personalized demo today.
+            </p>
+            <div class="hero-actions">
+                <a href="#" class="btn-primary" style="background: white; color: var(--primary-orange);">
+                    Schedule Demo
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+                    </svg>
+                </a>
+                <a href="#" class="btn-secondary" style="background: rgba(255,255,255,0.2);">
+                    Contact Sales
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Platform</h4>
+                <ul class="footer-links">
+                    <li><a href="#">AI Traffic Optimization</a></li>
+                    <li><a href="#">Real-time Analytics</a></li>
+                    <li><a href="#">Predictive Modeling</a></li>
+                    <li><a href="#">Smart Integrations</a></li>
+                    <li><a href="#">Mobile Apps</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Solutions</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Smart Cities</a></li>
+                    <li><a href="#">Highway Management</a></li>
+                    <li><a href="#">Urban Planning</a></li>
+                    <li><a href="#">Emergency Response</a></li>
+                    <li><a href="#">Public Transport</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Resources</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Documentation</a></li>
+                    <li><a href="#">API Reference</a></li>
+                    <li><a href="#">Case Studies</a></li>
+                    <li><a href="#">Whitepapers</a></li>
+                    <li><a href="#">Webinars</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul class="footer-links">
+                    <li><a href="#">About ASOR</a></li>
+                    <li><a href="#">Careers</a></li>
+                    <li><a href="#">Press</a></li>
+                    <li><a href="#">Partners</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 ASOR. All rights reserved. | For the Traffic You Would Love</p>
+        </div>
+    </footer>
+
+    <script>
+        // Remove loading screen
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loadingOverlay').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                }, 500);
+            }, 1000);
+        });
+
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 100) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Animated counter for stats
+        function animateCounter(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                element.textContent = Math.floor(current) + (target >= 100 ? '' : '');
+            }, 16);
+        }
+
+        // Intersection Observer for stats animation
+        const statsObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const statNumbers = entry.target.querySelectorAll('.stat-number');
+                    statNumbers.forEach(stat => {
+                        const target = parseInt(stat.dataset.count);
+                        animateCounter(stat, target);
+                    });
+                    statsObserver.unobserve(entry.target);
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const statsSection = document.querySelector('.stats-section');
+            if (statsSection) {
+                statsObserver.observe(statsSection);
+            }
+        });
+
+        // 3D Background Animation
+        let scene, camera, renderer, particles;
+
+        function init3DBackground() {
+            const canvas = document.getElementById('heroCanvas');
+            if (!canvas) return;
+
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            // Create particle system
+            const particleCount = 200;
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 20;
+                positions[i + 1] = (Math.random() - 0.5) * 20;
+                positions[i + 2] = (Math.random() - 0.5) * 20;
+
+                // Orange to cyan gradient
+                const t = Math.random();
+                colors[i] = 1 * t + 0 * (1 - t);     // R
+                colors[i + 1] = 0.42 * t + 0.83 * (1 - t); // G
+                colors[i + 2] = 0.21 * t + 1 * (1 - t);    // B
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+            const material = new THREE.PointsMaterial({
+                size: 3,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+
+            camera.position.z = 5;
+
+            // Add connecting lines
+            const lineGeometry = new THREE.BufferGeometry();
+            const linePositions = [];
+            
+            for (let i = 0; i < particleCount; i++) {
+                for (let j = i + 1; j < particleCount; j++) {
+                    const dist = Math.sqrt(
+                        Math.pow(positions[i*3] - positions[j*3], 2) +
+                        Math.pow(positions[i*3+1] - positions[j*3+1], 2) +
+                        Math.pow(positions[i*3+2] - positions[j*3+2], 2)
+                    );
+                    
+                    if (dist < 3) {
+                        linePositions.push(positions[i*3], positions[i*3+1], positions[i*3+2]);
+                        linePositions.push(positions[j*3], positions[j*3+1], positions[j*3+2]);
+                    }
+                }
+            }
+
+            lineGeometry.setAttribute('position', new THREE.Float32BufferAttribute(linePositions, 3));
+            const lineMaterial = new THREE.LineBasicMaterial({
+                color: 0x00D4FF,
+                transparent: true,
+                opacity: 0.2
+            });
+            const lines = new THREE.LineSegments(lineGeometry, lineMaterial);
+            scene.add(lines);
+
+            animate3D();
+        }
+
+        function animate3D() {
+            requestAnimationFrame(animate3D);
+            
+            if (particles) {
+                particles.rotation.x += 0.001;
+                particles.rotation.y += 0.002;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (camera && renderer) {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+            }
+        });
+
+        // Initialize 3D background
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(init3DBackground, 1000);
+        });
+
+        // Smooth scroll for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Dynamic widget updates
+        function updateDashboardWidgets() {
+            const widgets = document.querySelectorAll('.widget-value');
+            widgets.forEach(widget => {
+                const currentValue = parseInt(widget.textContent);
+                const variation = Math.random() * 10 - 5; // ±5% variation
+                let newValue;
+                
+                if (widget.textContent.includes('mph')) {
+                    newValue = Math.max(30, Math.min(50, currentValue + variation));
+                    widget.textContent = Math.round(newValue) + ' mph';
+                } else if (widget.textContent.includes('%')) {
+                    newValue = Math.max(85, Math.min(99, currentValue + variation));
+                    widget.textContent = newValue.toFixed(1) + '%';
+                } else if (widget.textContent.includes('kWh')) {
+                    newValue = Math.max(500, currentValue + Math.random() * 100 - 50);
+                    widget.textContent = Math.round(newValue) + ' kWh';
+                } else if (!isNaN(currentValue)) {
+                    newValue = Math.max(0, currentValue + Math.round(variation));
+                    widget.textContent = newValue;
+                }
+            });
+        }
+
+        // Update dashboard widgets every 3 seconds
+        setInterval(updateDashboardWidgets, 3000);
+
+        // Add hover effects to feature cards
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-10px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+
+        // Parallax effect for sections
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            const parallax = document.querySelector('.dashboard-preview');
+            if (parallax) {
+                const speed = 0.5;
+                parallax.style.transform = `translateY(${scrolled * speed}px)`;
+            }
+        });
+
+        // Progressive enhancement for animations
+        if (window.CSS && CSS.supports('animation', 'none')) {
+            document.body.classList.add('animations-enabled');
+        }
+    </script>
+</body>
+</html>
